@@ -3,9 +3,6 @@ package com.anassifi.spring.contollers;
 import java.util.List;
 import java.util.Optional;
 
-import com.anassifi.spring.entities.Employee;
-import com.anassifi.spring.repositories.EmployeeRepository;
-
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,11 +14,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class EmployeeController {
 
-    private EmployeeRepository employeeRepository;
+    private final EmployeeRepository employeeRepository;
 
     public EmployeeController(EmployeeRepository employeeRepository) {
         this.employeeRepository = employeeRepository;
-    };
+    }
 
     @GetMapping("/employees")
     public List<Employee> getEmployees() {
@@ -30,7 +27,7 @@ public class EmployeeController {
 
     @GetMapping("/employee/{id}")
     public Optional<Employee> getEmployee(@PathVariable Long id) {
-        return employeeRepository.findById(id);
+        return employeeRepository.findById(id).orElseThrow(() -> new EmployeeNotFoundException(id));
     }
 
     @PostMapping("/employees")
@@ -40,10 +37,10 @@ public class EmployeeController {
 
     @PutMapping("/employee/{id}")
     public Employee replaceEmployee(@RequestBody Employee newEmployee, @PathVariable Long id) {
-        return employeeRepository.findById(id).map(newEmployee -> {
-            newEmployee.setName(newEmployee.getName());
-            newEmployee.setRole(newEmployee.getRole());
-            return employeeRepository.save(newEmployee);
+        return employeeRepository.findById(id).map(employee -> {
+            employee.setName(newEmployee.getName());
+            employee.setRole(newEmployee.getRole());
+            return employeeRepository.save(employee);
         }).orElseGet(() -> {
             newEmployee.setId(id);
             return employeeRepository.save(newEmployee);
@@ -51,7 +48,7 @@ public class EmployeeController {
     }
 
     @DeleteMapping("/employee/{id}")
-    public Employee removeEmployee(@PathVariable Long id){
+    public void removeEmployee(@PathVariable Long id) {
         employeeRepository.deleteById(id);
     }
 
