@@ -3,6 +3,10 @@ package com.anassifi.spring.contollers;
 import java.util.List;
 import java.util.Optional;
 
+import com.anassifi.spring.entities.*;
+import com.anassifi.spring.repositories.*;
+import com.anassifi.spring.errors.*;
+
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,8 +29,8 @@ public class EmployeeController {
         return employeeRepository.findAll();
     }
 
-    @GetMapping("/employee/{id}")
-    public Optional<Employee> getEmployee(@PathVariable Long id) {
+    @GetMapping("/employees/{id}")
+    public Employee getEmployee(@PathVariable Long id) {
         return employeeRepository.findById(id).orElseThrow(() -> new EmployeeNotFoundException(id));
     }
 
@@ -35,7 +39,7 @@ public class EmployeeController {
         return employeeRepository.save(newEmployee);
     }
 
-    @PutMapping("/employee/{id}")
+    @PutMapping("/employees/{id}")
     public Employee replaceEmployee(@RequestBody Employee newEmployee, @PathVariable Long id) {
         return employeeRepository.findById(id).map(employee -> {
             employee.setName(newEmployee.getName());
@@ -47,7 +51,7 @@ public class EmployeeController {
         });
     }
 
-    @DeleteMapping("/employee/{id}")
+    @DeleteMapping("/employees/{id}")
     public void removeEmployee(@PathVariable Long id) {
         employeeRepository.deleteById(id);
     }
